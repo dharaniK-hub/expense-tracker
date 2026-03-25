@@ -1,64 +1,42 @@
-import express from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
+const express = require('express');
+const mysql = require('mysql2');
+const cors = require('cors');
+require('dotenv').config();
 
-// Load environment variables
-dotenv.config()
+const app = express();
 
-const app = express()
-const PORT = process.env.PORT || 5000
+// Middleware: Allows React to talk to Node
+app.use(cors());
+app.use(express.json());
 
-// Middleware
-app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+// TiDB Database Connection
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized: true
+    }
+});
 
-// Health check route
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Expense Tracker API',
-    status: 'running',
-    version: '1.0.0'
-  })
-})
+db.connect((err) => {
+    if (err) {
+        console.error('❌ Database connection failed:', err.message);
+        return;
+    }
+    console.log('✅ Successfully connected to TiDB Cloud!');
+});
 
-// Placeholder routes
-app.get('/expenses', (req, res) => {
-  res.json({
-    success: true,
-    data: [],
-    message: 'No expenses data yet'
-  })
-})
+// A simple test route
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'The backend server is running perfectly!' });
+});
 
-app.post('/expenses', (req, res) => {
-  res.status(201).json({
-    success: true,
-    message: 'Expense created successfully'
-  })
-})
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).json({
-    success: false,
-    message: 'Internal Server Error',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred'
-  })
-})
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  })
-})
-
+// Start the server and KEEP IT ALIVE
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`)
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
-})
-
-export default app
+    console.log(`🚀 Server is awake and listening on port ${PORT}`);
+});
