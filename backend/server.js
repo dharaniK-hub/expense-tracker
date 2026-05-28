@@ -35,6 +35,37 @@ app.get('/api/test', (req, res) => {
     res.json({ message: 'The backend server is running perfectly!' });
 });
 
+// ==========================================
+// THE MISSING ROUTE: Save a new expense
+// ==========================================
+app.post('/expenses', (req, res) => {
+    const { amount, description, date, category_id } = req.body;
+
+    // Validate the data
+    if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Please provide a valid positive amount." });
+    }
+    if (!date || !category_id) {
+        return res.status(400).json({ error: "Date and Category are required." });
+    }
+
+    // Insert into TiDB
+    const sql = "INSERT INTO expenses (amount, description, date, category_id) VALUES (?, ?, ?, ?)";
+    const values = [amount, description, date, category_id];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error("Error saving expense:", err);
+            return res.status(500).json({ error: "Failed to save expense to database." });
+        }
+        
+        res.status(201).json({ 
+            message: "Expense saved successfully!", 
+            expenseId: result.insertId 
+        });
+    });
+});
+
 // Start the server and KEEP IT ALIVE
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

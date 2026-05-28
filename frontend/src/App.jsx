@@ -1,54 +1,92 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useState } from 'react';
 
 function App() {
-  const [expenses, setExpenses] = useState([])
-  const [loading, setLoading] = useState(false)
+  // 1. We create "state" to hold whatever the user types into the form
+  const [expense, setExpense] = useState({
+    amount: '',
+    description: '',
+    date: '',
+    category_id: '1' // We'll default to 'Food' (ID: 1)
+  });
+  
+  // State for success/error messages
+  const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    fetchExpenses()
-  }, [])
+  // 2. This updates our state every time the user types a letter
+  const handleChange = (e) => {
+    setExpense({ ...expense, [e.target.name]: e.target.value });
+  };
 
-  const fetchExpenses = async () => {
+  // 3. THE CONNECTION: This sends the data to your Node.js backend!
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Stops the page from refreshing
+    setMessage('Sending to cloud...');
+
     try {
-      setLoading(true)
-      const response = await fetch('/api/expenses')
-      const data = await response.json()
-      setExpenses(data)
+      // Notice we are calling the exact URL and port your backend is running on
+      const response = await fetch('http://127.0.0.1:5000/expenses',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(expense) 
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage('✅ ' + data.message);
+        // Clear the form for the next expense
+        setExpense({ amount: '', description: '', date: '', category_id: '1' }); 
+      } else {
+        setMessage('❌ Error: ' + data.error);
+      }
     } catch (error) {
-      console.error('Error fetching expenses:', error)
-    } finally {
-      setLoading(false)
+      console.error(error);
+      setMessage('❌ Failed to connect to backend. Is the server running on port 5000?');
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">💰 Expense Tracker</h1>
-            <p className="text-gray-600">Track and manage your expenses efficiently</p>
-          </div>
-        </div>
+    <div style={{ padding: '40px', fontFamily: 'Arial, sans-serif', maxWidth: '400px', margin: '0 auto' }}>
+      <h1>💸 Expense Tracker</h1>
+      
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        
+        <input 
+          type="number" name="amount" value={expense.amount} onChange={handleChange} 
+          placeholder="Amount (e.g. 1500)" required 
+          style={{ padding: '10px' }}
+        />
+        
+        <input 
+          type="text" name="description" value={expense.description} onChange={handleChange} 
+          placeholder="What did you buy?" required 
+          style={{ padding: '10px' }}
+        />
+        
+        <input 
+          type="date" name="date" value={expense.date} onChange={handleChange} required 
+          style={{ padding: '10px' }}
+        />
+        
+        <select name="category_id" value={expense.category_id} onChange={handleChange} style={{ padding: '10px' }}>
+          <option value="1">Food</option>
+          <option value="2">Transport</option>
+          <option value="3">Entertainment</option>
+          <option value="4">Rent/Bills</option>
+          <option value="5">Other</option>
+        </select>
 
-        {loading ? (
-          <div className="mt-6 text-center text-gray-500">Loading expenses...</div>
-        ) : (
-          <div className="mt-6 bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Expenses</h2>
-            {expenses.length === 0 ? (
-              <p className="text-gray-500">No expenses found. Start adding expenses!</p>
-            ) : (
-              <div className="space-y-4">
-                {/* Expense items will be rendered here */}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+        <button type="submit" style={{ padding: '12px', background: '#007BFF', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+          Add Expense
+        </button>
+        
+      </form>
+
+      {message && <p style={{ marginTop: '20px', fontWeight: 'bold' }}>{message}</p>}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
