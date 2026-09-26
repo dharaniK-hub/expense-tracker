@@ -71,7 +71,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="lc-auth min-h-screen relative overflow-hidden flex flex-col justify-between font-sans text-white">
+    <div className="lc-auth min-h-screen relative overflow-hidden flex flex-col justify-between text-white">
       <div className="absolute top-24 right-12 md:right-32 w-32 h-32 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl flex items-center justify-center transform rotate-6 hover:rotate-12 transition-transform duration-500">
         <img className="h-full w-full rounded-2xl object-cover" src="/money.png" alt="Money and cryptocurrency" />
       </div>
@@ -137,7 +137,7 @@ export default function AuthPage() {
 
             {!isLogin && !isRecovery && <div>
               <label className="block text-xs font-bold text-blue-200 uppercase tracking-wide mb-1">Confirm password</label>
-              <input type={showPassword ? "text" : "password"} name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="Repeat your password" required className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all" />
+              <div className="password-field"><input type={showPassword ? "text" : "password"} name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="Repeat your password" required className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-blue-200/50 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all" /><button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide confirmed password" : "Show confirmed password"}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div>
             </div>}
 
             {isLogin && (
