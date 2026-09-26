@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import SummaryCard from "./SummaryCard";
 import SpendingCharts from "./SpendingCharts";
+import AppNav from "./AppNav";
 
 const API_URL = "http://localhost:5000";
 
@@ -108,6 +109,8 @@ const Dashboard = () => {
   };
 
   return (
+    <div className="lc-app-shell">
+      <AppNav />
     <main className="dashboard">
       <header className="dashboard-header">
         <div>
@@ -178,6 +181,7 @@ const Dashboard = () => {
         </aside>
       </section>
     </main>
+    </div>
   );
 };
 

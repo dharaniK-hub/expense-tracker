@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CircleUserRound, Mail, Save, Wallet } from "lucide-react";
+import AppNav from "./AppNav";
 
 const defaultProfile = {
   name: "",
@@ -13,10 +14,10 @@ const Profile = () => {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    const signedInUser = JSON.parse(localStorage.getItem("ledgercraft-user") || "null");
     const storedProfile = localStorage.getItem("expense-tracker-profile");
-    if (storedProfile) {
-      setProfile({ ...defaultProfile, ...JSON.parse(storedProfile) });
-    }
+    const savedProfile = storedProfile ? JSON.parse(storedProfile) : {};
+    setProfile({ ...defaultProfile, ...savedProfile, ...(signedInUser || {}) });
   }, []);
 
   const updateProfile = (event) => {
@@ -31,6 +32,8 @@ const Profile = () => {
   };
 
   return (
+    <div className="lc-app-shell">
+      <AppNav />
     <main className="profile-page">
       <header className="profile-heading">
         <div>
@@ -86,6 +89,7 @@ const Profile = () => {
         </footer>
       </form>
     </main>
+    </div>
   );
 };
 

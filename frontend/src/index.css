@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 :root {
+  --lc-ink: #edf7f4;
+  --lc-muted: #b8ccc9;
+  --lc-panel: rgba(8, 39, 43, .76);
+  --lc-panel-border: rgba(202, 248, 239, .22);
+  --lc-teal: #55e3ca;
+  --lc-action: #0bb38f;
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   color: #edf7f4;
   background: #07131b;
@@ -13,6 +19,7 @@
 body { min-width: 320px; margin: 0; background: #07131b; }
 button, input, select { font: inherit; }
 button { cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--lc-teal); outline-offset: 2px; }
 
 .lc-landing { position: relative; min-height: 100vh; overflow: hidden; padding: 12px 20px 0; background: linear-gradient(90deg, rgba(4, 16, 22, .83) 0%, rgba(5, 25, 31, .56) 47%, rgba(5, 16, 25, .67) 100%), url('/landingpage.png') center / cover no-repeat, linear-gradient(115deg, #07131b 0%, #0b2529 44%, #102f44 100%); }
 .lc-landing::before { content: ""; position: absolute; inset: 52px 0 0; opacity: .22; background: linear-gradient(rgba(64, 214, 191, .09) 1px, transparent 1px), linear-gradient(90deg, rgba(64, 214, 191, .09) 1px, transparent 1px); background-size: 44px 44px; mask-image: linear-gradient(to bottom, #000, transparent 80%); }
@@ -22,7 +29,10 @@ button { cursor: pointer; }
 .lc-brand { display: flex; align-items: center; gap: 9px; color: #fff; text-decoration: none; font-size: 15px; letter-spacing: .2px; }
 .lc-brand strong { color: #c7fff0; font-weight: 500; }.lc-brand small { display: block; color: #91c3ba; font-size: 6px; letter-spacing: 1px; }.lc-brand-mark { display: grid; width: 27px; height: 27px; place-items: center; overflow: hidden; border: 1px solid #21d8c1; border-radius: 8px; background: #063e46; }.lc-brand-mark img { width: 18px; filter: hue-rotate(100deg) saturate(1.5); }
 .lc-nav-links { display: flex; gap: 4px; padding: 4px; border-radius: 20px; background: rgba(9, 21, 31, .46); }.lc-nav-links a, .lc-nav-actions a { color: #c2d1d5; font-size: 11px; text-decoration: none; }.lc-nav-links a { padding: 6px 11px; border-radius: 15px; }.lc-nav-links a.active, .lc-nav-links a:hover { color: #fff; background: rgba(113, 222, 211, .22); }.lc-nav-actions { display: flex; align-items: center; gap: 16px; }.lc-nav-cta { padding: 8px 13px; border-radius: 7px; background: #08ad8c; color: #fff !important; font-weight: 700; }
+.lc-greeting { color: #c7fff0; font-size: 11px; font-weight: 700; }
 .lc-hero { display: grid; grid-template-columns: minmax(0, 1fr) 312px; gap: 70px; align-items: center; min-height: 465px; padding: 48px 0 30px; }.lc-hero-copy { max-width: 600px; }.lc-kicker { margin: 0 0 12px; color: #40d6bd; font-size: 10px; font-weight: 700; letter-spacing: 1px; }.lc-kicker i { display: inline-block; width: 5px; height: 5px; margin-right: 6px; border-radius: 50%; background: #20d5ae; }.lc-hero h1 { max-width: 570px; margin: 0 0 12px; color: #f5fbfa; font-size: clamp(42px, 5vw, 65px); line-height: .98; letter-spacing: -2px; }.lc-hero h1 em { color: #55e3ca; font-style: normal; }.lc-hero-text { max-width: 455px; color: #b9c8c9; font-size: 14px; line-height: 1.5; }.lc-hero-actions { display: flex; gap: 10px; margin-top: 24px; }.lc-primary, .lc-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 7px; font-size: 11px; font-weight: 700; text-decoration: none; }.lc-primary { background: #0bb38f; color: #fff; }.lc-secondary { border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.13); color: #eff7f7; }.lc-proof { display: flex; gap: 21px; margin-top: 30px; color: #d6e5e3; font-size: 10px; }.lc-proof b { color: #20d5ae; }.lc-proof small { margin-left: 3px; color: #8da7a9; }
+.lc-hero-public { grid-template-columns: 1fr; min-height: 465px; }.lc-hero-public .lc-hero-copy { max-width: 650px; }
+.lc-home-entry { position: relative; z-index: 1; display: flex; min-height: calc(100vh - 98px); max-width: 1240px; margin: 0 auto; align-items: center; justify-content: center; padding: 34px 0; }.lc-home-entry .lc-entry-card { width: min(100%, 420px); }
 .lc-entry-card { display: grid; gap: 12px; padding: 21px; border: 1px solid rgba(221, 255, 247, .31); border-radius: 16px; background: linear-gradient(145deg, rgba(108, 133, 140, .56), rgba(23, 42, 50, .74)); box-shadow: 0 20px 40px rgba(0, 0, 0, .28), inset 0 1px rgba(255,255,255,.22); backdrop-filter: blur(14px); }.lc-card-top { display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.14); }.lc-card-top h2 { margin: 0; color: #fff; font-size: 19px; }.lc-card-top svg { color: #82d9cc; }.lc-entry-card label { display: grid; gap: 5px; color: #b9cbca; font-size: 8px; font-weight: 700; letter-spacing: .5px; }.lc-entry-card input, .lc-entry-card select { min-height: 34px; width: 100%; border: 0; border-radius: 7px; padding: 8px 10px; color: #1d3037; background: #f6f8f8; font-size: 11px; }.lc-entry-row { display: grid; grid-template-columns: 1fr 1.2fr; gap: 9px; }.lc-quick { display: flex; align-items: center; gap: 5px; color: #99b1b1; font-size: 8px; }.lc-quick button { border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 4px 7px; color: #d8e5e3; background: rgba(255,255,255,.08); font-size: 8px; }.lc-submit { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 37px; border: 0; border-radius: 7px; color: #fff; background: #07aa88; font-size: 11px; font-weight: 700; }.lc-submit:disabled { opacity: .7; }.lc-form-message { margin: 0; color: #9df3d7; font-size: 10px; text-align: center; }.lc-secure { margin: 0; color: #9db5b4; font-size: 8px; text-align: center; }
 .lc-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px 0 38px; }.lc-features article { min-height: 125px; padding: 18px; border: 1px solid rgba(255,255,255,.22); border-radius: 11px; background: rgba(29, 46, 54, .63); box-shadow: 0 12px 25px rgba(0,0,0,.18); backdrop-filter: blur(12px); }.lc-features article > span { display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid #24bfa9; border-radius: 7px; color: #4fe1c8; background: rgba(10, 166, 142, .18); }.lc-features h3 { margin: 13px 0 6px; color: #fff; font-size: 13px; }.lc-features p { margin: 0; color: #a4b7b8; font-size: 10px; line-height: 1.55; }.lc-footer { display: flex; justify-content: space-between; padding: 15px 0 18px; border-top: 1px solid rgba(255,255,255,.13); color: #8ca3a7; font-size: 9px; }
 .lc-auth { position: relative; isolation: isolate; background: linear-gradient(90deg, rgba(2, 14, 20, .76), rgba(4, 28, 32, .48), rgba(2, 14, 20, .72)), url('/login.png') center / cover no-repeat, #061217; }.lc-auth::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .2; background: linear-gradient(rgba(45, 215, 191, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(45, 215, 191, .08) 1px, transparent 1px); background-size: 48px 48px; }.lc-auth nav { min-height: 53px; border-bottom: 1px solid rgba(255,255,255,.1); background: rgba(3, 16, 24, .7); }.lc-auth nav button { color: #adc5c5; }.lc-auth nav button:first-child { color: #5de4cf; }.lc-auth main > div { border-color: rgba(194, 246, 236, .32); border-radius: 17px; background: linear-gradient(145deg, rgba(84, 125, 122, .58), rgba(2, 38, 35, .83)); box-shadow: 0 22px 50px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.28); }.lc-auth input { border-color: rgba(186, 235, 224, .25); background: rgba(7, 35, 34, .54); }.lc-auth input:focus { box-shadow: 0 0 0 2px rgba(46, 218, 194, .6); }.lc-auth button[type="submit"] { background: linear-gradient(90deg, #36d7dd, #1598e5); color: #031820; box-shadow: 0 8px 20px rgba(23, 192, 215, .32); }.lc-auth button[type="submit"]:hover { background: linear-gradient(90deg, #68e5dd, #43b9f3); }.lc-auth footer { border-top: 1px solid rgba(255,255,255,.12); background: rgba(2, 14, 22, .55); }
@@ -368,4 +378,115 @@ h2 { margin: 4px 0 0; font-size: 18px; letter-spacing: 0; }
   .profile-heading > svg { width: 30px; }
   .legend-row { gap: 8px; }
   .legend-row strong { font-size: 12px; }
+}
+
+/* Shared application theme */
+.lc-app-shell {
+  min-height: 100vh;
+  padding: 12px 20px 44px;
+  color: #edf7f4;
+  background: linear-gradient(135deg, rgba(4, 19, 25, .96), rgba(6, 42, 43, .92)), url('/landingpage.png') center / cover fixed;
+}
+
+.lc-app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(88, 222, 199, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(88, 222, 199, .05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.lc-app-nav {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(1160px, 100%);
+  min-height: 58px;
+  margin: 0 auto 34px;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(192, 245, 232, .28);
+  border-radius: 8px;
+  background: rgba(7, 29, 37, .72);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(16px);
+}
+
+.lc-app-nav nav, .lc-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lc-app-nav nav > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #c2d1d5;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.lc-app-nav nav > a:hover, .lc-app-nav .lc-profile-link:hover { color: #65ead2; }
+.lc-profile-link { padding-left: 12px; border-left: 1px solid rgba(255, 255, 255, .16); }
+.lc-user-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-profile-icon { display: grid; width: 31px; height: 31px; place-items: center; border: 1px solid rgba(192, 245, 232, .36); border-radius: 50%; color: #6ce6d1 !important; background: rgba(255, 255, 255, .08); }
+
+.lc-app-shell .dashboard, .lc-app-shell .profile-page {
+  position: relative;
+  z-index: 1;
+  width: min(1160px, 100%);
+  margin: 0 auto;
+  padding: 0;
+}
+
+.lc-app-shell .dashboard-header, .lc-app-shell .profile-heading { color: #f4fffc; }
+.lc-app-shell .subtitle, .lc-app-shell .profile-heading p:not(.eyebrow) { color: #b8ccc9; }
+.lc-app-shell .eyebrow, .lc-app-shell .header-icon, .lc-app-shell .profile-heading > svg { color: #55e3ca; }
+
+.lc-app-shell .filter-bar, .lc-app-shell .summary-card, .lc-app-shell .chart-panel, .lc-app-shell .insight-card, .lc-app-shell .profile-form {
+  border-color: rgba(202, 248, 239, .22);
+  background: rgba(8, 39, 43, .76);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, .23);
+  backdrop-filter: blur(14px);
+}
+
+.lc-app-shell .filter-bar, .lc-app-shell .summary-card, .lc-app-shell .chart-panel, .lc-app-shell .insight-card, .lc-app-shell .profile-form { color: #edf7f4; }
+.lc-app-shell .filter-bar label, .lc-app-shell .summary-card-head > span:first-child, .lc-app-shell .summary-card p, .lc-app-shell .insight-card p, .lc-app-shell .legend-row { color: #b8ccc9; }
+.lc-app-shell .legend-row strong, .lc-app-shell .panel-title > svg { color: #dffaf2; }
+
+.lc-app-shell input, .lc-app-shell select {
+  border-color: rgba(186, 235, 224, .25);
+  color: #effcf8;
+  background: rgba(3, 24, 28, .72);
+}
+
+.lc-app-shell option { color: #effcf8; background: #08272b; }
+.lc-app-shell .apply-button, .lc-app-shell .profile-actions button { border: 0; background: linear-gradient(90deg, #31cfcc, #1598e5); color: #031820; }
+.lc-app-shell .clear-button { color: #65ead2; }
+.lc-app-shell .summary-icon { background: rgba(70, 213, 191, .14); color: #65ead2; }
+.lc-app-shell .income-card .summary-icon, .lc-app-shell .expense-card .summary-icon, .lc-app-shell .balance-card .summary-icon { color: #65ead2; background: rgba(70, 213, 191, .14); }
+.lc-app-shell .chart-box, .lc-app-shell .pie-box { color: #b8ccc9; }
+
+/* Common visual primitives used by all LedgerCraft screens. */
+.lc-landing, .lc-auth, .lc-app-shell { font-family: "Trebuchet MS", "Segoe UI", sans-serif; }
+.lc-landing button, .lc-auth button, .lc-app-shell button { transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s ease; }
+.lc-landing svg, .lc-auth svg, .lc-app-shell svg { flex: 0 0 auto; stroke-width: 2; }
+.lc-landing input, .lc-landing select, .lc-auth input, .lc-app-shell input, .lc-app-shell select { font-family: inherit; }
+.lc-auth .password-field button:hover { color: var(--lc-teal); }
+
+.password-field { position: relative; }
+.password-field input { padding-right: 46px !important; }
+.password-field button { position: absolute; top: 50%; right: 9px; display: grid; width: 30px; height: 30px; place-items: center; transform: translateY(-50%); border: 0; color: #82d9cc; background: transparent; }
+
+@media (max-width: 600px) {
+  .lc-app-shell { padding: 10px 14px 32px; }
+  .lc-app-nav { margin-bottom: 24px; padding: 0 12px; }
+  .lc-app-nav nav > a:first-child { font-size: 0; }
+  .lc-user-name { display: none; }
+  .lc-profile-link { padding-left: 8px; }
+  .lc-nav-actions > a:first-child { display: none; }
 }

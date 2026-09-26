@@ -5,8 +5,11 @@ import Login from "./components/Login";
 import Profile from "./components/Profile";
 
 const routes = {
-  "/": Landing,
+  "/": () => <Landing showExpenseForm={false} />,
+  "/home": () => <Landing showExpenseForm />,
   "/login": Login,
+  "/signup": Login,
+  "/forgot-password": Login,
   "/dashboard": Dashboard,
   "/profile": Profile,
 };
