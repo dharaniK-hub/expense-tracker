@@ -2,7 +2,7 @@ import pool from '../config/database.js'
 
 export const getExpenses = async (req, res) => {
   try {
-    const [expenses] = await pool.query('SELECT * FROM expenses LIMIT 10')
+    const [expenses] = await pool.query('SELECT * FROM expenses ORDER BY date DESC, id DESC LIMIT 100')
     res.json({
       success: true,
       data: expenses
@@ -18,11 +18,20 @@ export const getExpenses = async (req, res) => {
 
 export const createExpense = async (req, res) => {
   try {
-    const { user_id, category_id, description, amount, date, payment_method, notes } = req.body
+    const { category_id, description, amount, date, payment_method, notes } = req.body
+    const numericAmount = Number(amount)
+    const numericCategoryId = Number(category_id)
+
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+      return res.status(400).json({ success: false, error: 'Please provide a valid positive amount.' })
+    }
+    if (!description?.trim() || !date || !Number.isInteger(numericCategoryId)) {
+      return res.status(400).json({ success: false, error: 'Description, date, and category are required.' })
+    }
     
     const [result] = await pool.query(
       'INSERT INTO expenses (user_id, category_id, description, amount, date, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [user_id, category_id, description, amount, date, payment_method, notes]
+      [1, numericCategoryId, description.trim(), numericAmount, date, payment_method || null, notes || null]
     )
     
     res.status(201).json({
