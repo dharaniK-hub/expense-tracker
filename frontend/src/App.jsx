@@ -1,70 +1,92 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import Dashboard from './components/Dashboard'
+import { useState } from 'react';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+  // 1. We create "state" to hold whatever the user types into the form
+  const [expense, setExpense] = useState({
+    amount: '',
+    description: '',
+    date: '',
+    category_id: '1' // We'll default to 'Food' (ID: 1)
+  });
+  
+  // State for success/error messages
+  const [message, setMessage] = useState('');
+
+  // 2. This updates our state every time the user types a letter
+  const handleChange = (e) => {
+    setExpense({ ...expense, [e.target.name]: e.target.value });
+  };
+
+  // 3. THE CONNECTION: This sends the data to your Node.js backend!
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Stops the page from refreshing
+    setMessage('Sending to cloud...');
+
+    try {
+      // Notice we are calling the exact URL and port your backend is running on
+      const response = await fetch('http://127.0.0.1:5000/expenses',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(expense) 
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage('✅ ' + data.message);
+        // Clear the form for the next expense
+        setExpense({ amount: '', description: '', date: '', category_id: '1' }); 
+      } else {
+        setMessage('❌ Error: ' + data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage('❌ Failed to connect to backend. Is the server running on port 5000?');
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar / Navigation */}
-      <div className="flex">
-        <div className="w-64 bg-indigo-900 min-h-screen text-white p-6 hidden md:block">
-          <h1 className="text-2xl font-bold mb-10 flex items-center gap-2">
-            <span className="text-3xl">💰</span> Expensy
-          </h1>
-          <nav className="space-y-2">
-            <button 
-              onClick={() => setActiveTab('dashboard')}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${activeTab === 'dashboard' ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-800'}`}
-            >
-              📊 Dashboard
-            </button>
-            <button 
-              onClick={() => setActiveTab('expenses')}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${activeTab === 'expenses' ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-800'}`}
-            >
-              💸 Expenses
-            </button>
-            <button 
-              className="w-full text-left px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 transition-colors"
-            >
-              📂 Categories
-            </button>
-            <button 
-              className="w-full text-left px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 transition-colors"
-            >
-              ⚙️ Settings
-            </button>
-          </nav>
-        </div>
+    <div style={{ padding: '40px', fontFamily: 'Arial, sans-serif', maxWidth: '400px', margin: '0 auto' }}>
+      <h1>💸 Expense Tracker</h1>
+      
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        
+        <input 
+          type="number" name="amount" value={expense.amount} onChange={handleChange} 
+          placeholder="Amount (e.g. 1500)" required 
+          style={{ padding: '10px' }}
+        />
+        
+        <input 
+          type="text" name="description" value={expense.description} onChange={handleChange} 
+          placeholder="What did you buy?" required 
+          style={{ padding: '10px' }}
+        />
+        
+        <input 
+          type="date" name="date" value={expense.date} onChange={handleChange} required 
+          style={{ padding: '10px' }}
+        />
+        
+        <select name="category_id" value={expense.category_id} onChange={handleChange} style={{ padding: '10px' }}>
+          <option value="1">Food</option>
+          <option value="2">Transport</option>
+          <option value="3">Entertainment</option>
+          <option value="4">Rent/Bills</option>
+          <option value="5">Other</option>
+        </select>
 
-        {/* Main Content */}
-        <div className="flex-1">
-          <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8">
-            <h2 className="text-xl font-semibold text-gray-800 capitalize">{activeTab}</h2>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">Welcome, User</span>
-              <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold">
-                U
-              </div>
-            </div>
-          </header>
+        <button type="submit" style={{ padding: '12px', background: '#007BFF', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+          Add Expense
+        </button>
+        
+      </form>
 
-          <main className="p-8">
-            {activeTab === 'dashboard' ? (
-              <Dashboard />
-            ) : (
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <h2 className="text-xl font-semibold mb-4">Expense Management</h2>
-                <p className="text-gray-500 italic">Work in progress (Member 1)</p>
-              </div>
-            )}
-          </main>
-        </div>
-      </div>
+      {message && <p style={{ marginTop: '20px', fontWeight: 'bold' }}>{message}</p>}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

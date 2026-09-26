@@ -1,53 +1,73 @@
-import express from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
-import expenseRoutes from './routes/expenseRoutes.js'
-import summaryRoutes from './routes/summaryRoutes.js'
+const express = require('express');
+const mysql = require('mysql2');
+const cors = require('cors');
+require('dotenv').config();
 
-dotenv.config()
+const app = express();
 
-const app = express()
-const DEFAULT_PORT = Number(process.env.PORT) || 5000
+// Middleware: Allows React to talk to Node
+app.use(cors());
+app.use(express.json());
 
-// Middleware
-app.use(cors())
-app.use(express.json())
+// TiDB Database Connection
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized: true
+    }
+});
 
-// Routes
-app.use('/api/expenses', expenseRoutes)
-app.use('/api/summary', summaryRoutes)
+db.connect((err) => {
+    if (err) {
+        console.error('❌ Database connection failed:', err.message);
+        return;
+    }
+    console.log('✅ Successfully connected to TiDB Cloud!');
+});
 
-// Health check
-app.get('/', (req, res) => {
-  res.json({ message: 'Expense Tracker API is running' })
-})
+// A simple test route
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'The backend server is running perfectly!' });
+});
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: err.message
-  })
-})
+// ==========================================
+// THE MISSING ROUTE: Save a new expense
+// ==========================================
+app.post('/expenses', (req, res) => {
+    const { amount, description, date, category_id } = req.body;
 
-function startServer(port) {
-  const server = app.listen(port, () => {
-    console.log(`Server is running on port ${port}`)
-  })
-
-  server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-      const nextPort = port + 1
-      console.warn(`Port ${port} is in use. Retrying on port ${nextPort}...`)
-      startServer(nextPort)
-      return
+    // Validate the data
+    if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Please provide a valid positive amount." });
+    }
+    if (!date || !category_id) {
+        return res.status(400).json({ error: "Date and Category are required." });
     }
 
-    console.error('Failed to start server:', error)
-    process.exit(1)
-  })
-}
+    // Insert into TiDB
+    const sql = "INSERT INTO expenses (amount, description, date, category_id) VALUES (?, ?, ?, ?)";
+    const values = [amount, description, date, category_id];
 
-startServer(DEFAULT_PORT)
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error("Error saving expense:", err);
+            return res.status(500).json({ error: "Failed to save expense to database." });
+        }
+        
+        res.status(201).json({ 
+            message: "Expense saved successfully!", 
+            expenseId: result.insertId 
+        });
+    });
+});
+
+// Start the server and KEEP IT ALIVE
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server is awake and listening on port ${PORT}`);
+});
