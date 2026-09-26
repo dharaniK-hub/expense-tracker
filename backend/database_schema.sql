@@ -1,7 +1,7 @@
 -- Expense Tracker Database Schema
 
-CREATE DATABASE IF NOT EXISTS expense_tracker_db;
-USE expense_tracker_db;
+CREATE DATABASE IF NOT EXISTS expense_tracker;
+USE expense_tracker;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

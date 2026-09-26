@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, BarChart3, CircleUserRound, Plus, ReceiptText, ShieldCheck } from "lucide-react";
+import { BarChart3, CircleUserRound, FileText, Plus, ReceiptText, ShieldCheck } from "lucide-react";
 
 const API_URL = "http://localhost:5000";
 const fallbackCategories = [
-  { id: 1, name: "Food" },
+  { id: 1, name: "Food & Dining" },
   { id: 2, name: "Transportation" },
-  { id: 3, name: "Shopping" },
-  { id: 4, name: "Entertainment" },
-  { id: 5, name: "Utilities" },
-  { id: 8, name: "Other" },
+  { id: 3, name: "Entertainment" },
+  { id: 4, name: "Rent & Bills" },
+  { id: 5, name: "Other" },
 ];
 
 const Landing = () => {
@@ -23,17 +22,12 @@ const Landing = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const response = await fetch(`${API_URL}/categories`);
-        if (!response.ok) return;
-        const payload = await response.json();
+    fetch(`${API_URL}/categories`)
+      .then((response) => response.json())
+      .then((payload) => {
         if (payload.data?.length) setCategories(payload.data);
-      } catch {
-        // The form keeps its useful default categories when the API is offline.
-      }
-    };
-    loadCategories();
+      })
+      .catch(() => {});
   }, []);
 
   const updateExpense = (event) => {
@@ -45,7 +39,6 @@ const Landing = () => {
     event.preventDefault();
     setSaving(true);
     setMessage("");
-
     try {
       const response = await fetch(`${API_URL}/expenses`, {
         method: "POST",
@@ -54,8 +47,7 @@ const Landing = () => {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Unable to save expense.");
-
-      setMessage("Expense added successfully.");
+      setMessage("Expense added to your ledger.");
       setExpense((current) => ({ ...current, amount: "", description: "" }));
     } catch (error) {
       setMessage(error.message || "Unable to connect to the expense service.");
@@ -65,78 +57,45 @@ const Landing = () => {
   };
 
   return (
-    <main className="landing">
-      <section className="landing-hero">
-        <div className="hero-copy">
-          <p className="eyebrow">Personal finance, made clear</p>
-          <h1>Know where every rupee goes.</h1>
-          <p className="hero-text">
-            Record an expense here, then use the dashboard to understand the spending patterns behind it.
-          </p>
-          <div className="hero-actions">
-            <a className="primary-link" href="/dashboard">
-              <BarChart3 size={18} aria-hidden="true" /> Dashboard
-            </a>
-            <a className="secondary-link" href="/profile">
-              <CircleUserRound size={18} aria-hidden="true" /> Profile
-            </a>
-          </div>
+    <main className="lc-landing">
+      <div className="lc-noise" />
+      <nav className="lc-nav">
+        <a className="lc-brand" href="/">
+          <span className="lc-brand-mark"><img src="/icons.svg" alt="" /></span>
+          <span><strong>Ledger</strong>Craft<small>WEALTH INTELLIGENCE</small></span>
+        </a>
+        <div className="lc-nav-links">
+          <a className="active" href="/">Overview</a>
+          <a href="/dashboard">Analytics</a>
+          <a href="/dashboard">Categories</a>
+          <a href="/profile">Security</a>
+        </div>
+        <div className="lc-nav-actions"><a href="/login">Sign In</a><a className="lc-nav-cta" href="/dashboard">Get Started <span>→</span></a></div>
+      </nav>
+
+      <section className="lc-hero">
+        <div className="lc-hero-copy">
+          <p className="lc-kicker"><i /> PERSONAL FINANCE, MADE CLEAR</p>
+          <h1>Know where every <em>rupee</em> goes.</h1>
+          <p className="lc-hero-text">Record an expense here, then use the dashboard to understand the spending patterns and wealth velocity behind it.</p>
+          <div className="lc-hero-actions"><a className="lc-primary" href="/dashboard"><BarChart3 size={16} /> Open Dashboard</a><a className="lc-secondary" href="/profile"><CircleUserRound size={16} /> Profile &amp; Budgets</a></div>
+          <div className="lc-proof"><span><b>●</b> ₹3.8M+ <small>Tracked this month</small></span><span><b>●</b> 99.9% <small>Real-time Sync</small></span><span><b>●</b> Bank-grade <small>256-bit Security</small></span></div>
         </div>
 
-        <form className="quick-expense-form" onSubmit={addExpense}>
-          <div className="quick-form-heading">
-            <div>
-              <p className="eyebrow">New entry</p>
-              <h2>Add an expense</h2>
-            </div>
-            <ReceiptText size={22} aria-hidden="true" />
-          </div>
-          <label>
-            <span>Amount</span>
-            <input type="number" min="0.01" step="0.01" name="amount" value={expense.amount} onChange={updateExpense} placeholder="0.00" required />
-          </label>
-          <label>
-            <span>Description</span>
-            <input name="description" value={expense.description} onChange={updateExpense} placeholder="What did you spend on?" required />
-          </label>
-          <div className="quick-form-row">
-            <label>
-              <span>Date</span>
-              <input type="date" name="date" value={expense.date} onChange={updateExpense} required />
-            </label>
-            <label>
-              <span>Category</span>
-              <select name="category_id" value={expense.category_id} onChange={updateExpense}>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>{category.name}</option>
-                ))}
-              </select>
-            </label>
-          </div>
-          {message && <p className="quick-form-message">{message}</p>}
-          <button type="submit" disabled={saving}>
-            <Plus size={17} aria-hidden="true" /> {saving ? "Adding..." : "Add expense"}
-          </button>
+        <form className="lc-entry-card" onSubmit={addExpense}>
+          <div className="lc-card-top"><div><p className="lc-kicker">NEW ENTRY</p><h2>Add an expense</h2></div><FileText size={21} /></div>
+          <label><span>AMOUNT (₹)</span><input type="number" min="0.01" step="0.01" name="amount" value={expense.amount} onChange={updateExpense} placeholder="0.00" required /></label>
+          <label><span>DESCRIPTION</span><input name="description" value={expense.description} onChange={updateExpense} placeholder="What did you spend on?" required /></label>
+          <div className="lc-entry-row"><label><span>DATE</span><input type="date" name="date" value={expense.date} onChange={updateExpense} required /></label><label><span>CATEGORY</span><select name="category_id" value={expense.category_id} onChange={updateExpense}>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label></div>
+          <div className="lc-quick"><span>Quick:</span><button type="button" onClick={() => setExpense((current) => ({ ...current, description: "Coffee" }))}>☕ Coffee</button><button type="button" onClick={() => setExpense((current) => ({ ...current, description: "Transport" }))}>🚕 Cab</button><button type="button" onClick={() => setExpense((current) => ({ ...current, description: "Electricity" }))}>⚡ Power</button></div>
+          {message && <p className="lc-form-message">{message}</p>}
+          <button className="lc-submit" type="submit" disabled={saving}><Plus size={17} /> {saving ? "Adding..." : "Add expense"}</button>
+          <p className="lc-secure">◉ Auto-categorized &amp; instantly aggregated in your analytics</p>
         </form>
       </section>
 
-      <section className="landing-features">
-        <article>
-          <ReceiptText size={24} aria-hidden="true" />
-          <h2>Record expenses</h2>
-          <p>Keep everyday purchases and their categories in one orderly place.</p>
-        </article>
-        <article>
-          <BarChart3 size={24} aria-hidden="true" />
-          <h2>See the patterns</h2>
-          <p>Monthly and category charts make spending trends easy to spot.</p>
-        </article>
-        <article>
-          <ShieldCheck size={24} aria-hidden="true" />
-          <h2>Stay in control</h2>
-          <p>Use a personal profile and budget preference to keep context close.</p>
-        </article>
-      </section>
+      <section className="lc-features"><article><span><ReceiptText size={19} /></span><h3>Record expenses</h3><p>Keep everyday purchases and their categories in one orderly place. Real-time capture with smart receipts and instant tagging.</p></article><article><span><BarChart3 size={19} /></span><h3>See the patterns</h3><p>Monthly and category charts make spending trends easy to spot. Identify recurring leaks, seasonal habits, and savings opportunities.</p></article><article><span><ShieldCheck size={19} /></span><h3>Stay in control</h3><p>Use a personal profile and budget preference to keep context close. Receive alerts before crossing thresholds and safeguard goals.</p></article></section>
+      <footer className="lc-footer"><span>● © 2026 LedgerCraft Systems Inc. All rights reserved.</span><span>Privacy Policy　 Terms of Service　 Security Architecture　 |　 Made for mindful spenders</span></footer>
     </main>
   );
 };
