@@ -1,41 +1,25 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import expenseRoutes from './routes/expenseRoutes.js'
+import summaryRoutes from './routes/summaryRoutes.js'
 
-// Load environment variables
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const DEFAULT_PORT = Number(process.env.PORT) || 5000
 
 // Middleware
 app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 
-// Health check route
+// Routes
+app.use('/api/expenses', expenseRoutes)
+app.use('/api/summary', summaryRoutes)
+
+// Health check
 app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Expense Tracker API',
-    status: 'running',
-    version: '1.0.0'
-  })
-})
-
-// Placeholder routes
-app.get('/expenses', (req, res) => {
-  res.json({
-    success: true,
-    data: [],
-    message: 'No expenses data yet'
-  })
-})
-
-app.post('/expenses', (req, res) => {
-  res.status(201).json({
-    success: true,
-    message: 'Expense created successfully'
-  })
+  res.json({ message: 'Expense Tracker API is running' })
 })
 
 // Error handling middleware
@@ -43,22 +27,27 @@ app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).json({
     success: false,
-    message: 'Internal Server Error',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred'
+    message: 'Something went wrong!',
+    error: err.message
   })
 })
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
+function startServer(port) {
+  const server = app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
   })
-})
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`)
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
-})
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      const nextPort = port + 1
+      console.warn(`Port ${port} is in use. Retrying on port ${nextPort}...`)
+      startServer(nextPort)
+      return
+    }
 
-export default app
+    console.error('Failed to start server:', error)
+    process.exit(1)
+  })
+}
+
+startServer(DEFAULT_PORT)
