@@ -1,61 +1,69 @@
-import React from 'react'
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend 
-} from 'recharts'
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CalendarDays, Tags } from "lucide-react";
 
-const SpendingCharts = ({ monthlyData, categoryData }) => {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-      {/* Monthly Spending Chart */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Monthly Spending</h3>
-        <div className="h-80">
+const colors = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2"];
+const formatMoney = (value) =>
+  `Rs. ${Number(value || 0).toLocaleString("en-LK", { maximumFractionDigits: 0 })}`;
+
+const SpendingCharts = ({ loading, monthlyData, categoryData }) => (
+  <div className="chart-stack">
+    <article className="chart-panel">
+      <div className="panel-title">
+        <div>
+          <p className="eyebrow">Trend</p>
+          <h2>Monthly spending</h2>
+        </div>
+        <CalendarDays size={21} aria-hidden="true" />
+      </div>
+      <div className="chart-box">
+        {loading ? <p>Loading monthly spending...</p> : monthlyData.length ? (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
-              <Tooltip 
-                cursor={{fill: '#f9fafb'}}
-                contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
-              />
-              <Bar dataKey="amount" fill="#4F46E5" radius={[4, 4, 0, 0]} barSize={40} />
+            <BarChart data={monthlyData} margin={{ top: 10, right: 4, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dce5ef" />
+              <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+              <Tooltip formatter={formatMoney} />
+              <Bar dataKey="total" name="Expenses" fill="#2563eb" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        ) : <p>No expenses match these filters.</p>}
+      </div>
+    </article>
+
+    <article className="chart-panel">
+      <div className="panel-title">
+        <div>
+          <p className="eyebrow">Breakdown</p>
+          <h2>Spending by category</h2>
+        </div>
+        <Tags size={21} aria-hidden="true" />
+      </div>
+      <div className="category-chart-layout">
+        <div className="pie-box">
+          {loading ? <p>Loading categories...</p> : categoryData.length ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={categoryData} dataKey="total" nameKey="name" innerRadius={48} outerRadius={82} paddingAngle={3}>
+                  {categoryData.map((entry, index) => (
+                    <Cell key={entry.categoryId} fill={colors[index % colors.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={formatMoney} />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : <p>No category data available.</p>}
+        </div>
+        <div className="category-legend">
+          {categoryData.slice(0, 6).map((entry, index) => (
+            <div key={entry.categoryId} className="legend-row">
+              <span><i style={{ backgroundColor: colors[index % colors.length] }} />{entry.name}</span>
+              <strong>{formatMoney(entry.total)}</strong>
+            </div>
+          ))}
         </div>
       </div>
+    </article>
+  </div>
+);
 
-      {/* Category Spending Chart */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Spending by Category</h3>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={categoryData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="amount"
-                nameKey="category"
-              >
-                {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color || '#4F46E5'} />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
-              />
-              <Legend verticalAlign="bottom" height={36}/>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default SpendingCharts
+export default SpendingCharts;

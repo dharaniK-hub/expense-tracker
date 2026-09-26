@@ -1,24 +1,27 @@
-import React from 'react'
+import { ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
 
-const SummaryCard = ({ title, amount, icon: Icon, color, trend }) => {
+const iconMap = {
+  income: ArrowUpRight,
+  expense: ArrowDownRight,
+  balance: Wallet,
+};
+
+const SummaryCard = ({ title, amount, icon }) => {
+  const Icon = iconMap[icon];
+  const value = Number(amount || 0);
+
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 flex items-center space-x-4 border border-gray-100">
-      <div className={`p-3 rounded-lg ${color} bg-opacity-10`}>
-        <Icon className={`w-6 h-6 ${color.replace('bg-', 'text-')}`} />
+    <article className={`summary-card ${icon}-card`}>
+      <div className="summary-card-head">
+        <span>{title}</span>
+        <span className="summary-icon"><Icon size={20} aria-hidden="true" /></span>
       </div>
-      <div>
-        <p className="text-sm font-medium text-gray-500">{title}</p>
-        <div className="flex items-baseline space-x-2">
-          <h3 className="text-2xl font-bold text-gray-900">${amount.toLocaleString()}</h3>
-          {trend && (
-            <span className={`text-xs font-medium ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
+      <strong>
+        Rs. {value.toLocaleString("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      </strong>
+      <p>{icon === "income" ? "Income records are not yet tracked." : "For the selected filters."}</p>
+    </article>
+  );
+};
 
-export default SummaryCard
+export default SummaryCard;

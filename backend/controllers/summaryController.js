@@ -1,82 +1,137 @@
-import pool from '../config/database.js'
+import pool from "../config/database.js";
+
+const buildFilters = (query) => {
+  const conditions = [];
+  const values = [];
+
+  if (query.startDate) {
+    conditions.push("e.date >= ?");
+    values.push(query.startDate);
+  }
+
+  if (query.endDate) {
+    conditions.push("e.date <= ?");
+    values.push(query.endDate);
+  }
+
+  if (query.category) {
+    const categoryId = Number(query.category);
+    if (!Number.isInteger(categoryId) || categoryId < 1) {
+      throw new Error("Invalid category");
+    }
+    conditions.push("e.category_id = ?");
+    values.push(categoryId);
+  }
+
+  return {
+    where: conditions.length ? `WHERE ${conditions.join(" AND ")}` : "",
+    values,
+  };
+};
+
+const getFilters = (req, res) => {
+  try {
+    return buildFilters(req.query);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+    return null;
+  }
+};
 
 export const getSummary = async (req, res) => {
-  try {
-    // Note: Assuming there's an income table or field for income, but based on schema, 
-    // it's mainly expenses. Member 2 responsibilities mention "total income".
-    // For now, I'll calculate total expenses and leave income as 0 unless I add an income table.
-    // Based on database_schema.sql, only categories and expenses tables exist.
-    
-    const [expenseResult] = await pool.query('SELECT SUM(amount) as totalExpenses FROM expenses')
-    const totalExpenses = parseFloat(expenseResult[0].totalExpenses) || 0
-    
-    // For this example, let's assume a fixed budget or income if not implemented elsewhere
-    const totalIncome = 5000 // Placeholder or could be added to schema later
-    const balance = totalIncome - totalExpenses
+  const filters = getFilters(req, res);
+  if (!filters) return;
 
+  try {
+    const [totals] = await pool.query(
+      `SELECT COALESCE(SUM(e.amount), 0) AS totalExpenses FROM expenses e ${filters.where}`,
+      filters.values
+    );
+    const [topCategories] = await pool.query(
+      `SELECT e.category_id AS categoryId, COALESCE(c.name, "Uncategorized") AS name,
+              SUM(e.amount) AS total
+       FROM expenses e
+       LEFT JOIN categories c ON c.id = e.category_id
+       ${filters.where}
+       GROUP BY e.category_id, c.name
+       ORDER BY total DESC
+       LIMIT 1`,
+      filters.values
+    );
+
+    const totalExpenses = Number(totals[0].totalExpenses);
+    const totalIncome = 0;
     res.json({
       success: true,
       data: {
         totalIncome,
         totalExpenses,
-        balance
-      }
-    })
+        balance: totalIncome - totalExpenses,
+        highestSpendingCategory: topCategories[0] || null,
+      },
+    });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching summary',
-      error: error.message
-    })
+    res.status(500).json({ success: false, message: "Unable to calculate summary" });
   }
-}
+};
 
-export const getMonthlyExpenses = async (req, res) => {
+export const monthlyExpenses = async (req, res) => {
+  const filters = getFilters(req, res);
+  if (!filters) return;
+
   try {
-    const [monthlyData] = await pool.query(`
-      SELECT 
-        DATE_FORMAT(date, '%M') as month,
-        SUM(amount) as amount
-      FROM expenses
-      WHERE date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-      GROUP BY DATE_FORMAT(date, '%M'), MONTH(date)
-      ORDER BY YEAR(date), MONTH(date)
-    `)
+    const [monthlyData] = await pool.query(
+      `SELECT DATE_FORMAT(e.date, "%Y-%m") AS period,
+              DATE_FORMAT(e.date, "%b %Y") AS label,
+              SUM(e.amount) AS total
+       FROM expenses e
+       ${filters.where}
+       GROUP BY YEAR(e.date), MONTH(e.date), period, label
+       ORDER BY YEAR(e.date), MONTH(e.date)`,
+      filters.values
+    );
 
     res.json({
       success: true,
-      data: monthlyData
-    })
+      data: monthlyData.map((item) => ({ ...item, total: Number(item.total) })),
+    });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching monthly expenses',
-      error: error.message
-    })
+    res.status(500).json({ success: false, message: "Unable to calculate monthly expenses" });
   }
-}
+};
 
-export const getCategorySpending = async (req, res) => {
+export const categoryExpenses = async (req, res) => {
+  const filters = getFilters(req, res);
+  if (!filters) return;
+
   try {
-    const [categoryData] = await pool.query(`
-      SELECT 
-        c.name as category,
-        SUM(e.amount) as amount,
-        c.color
-      FROM expenses e
-      JOIN categories c ON e.category_id = c.id
-      GROUP BY c.name, c.color
-    `)
+    const [categoryData] = await pool.query(
+      `SELECT e.category_id AS categoryId, COALESCE(c.name, "Uncategorized") AS name,
+              SUM(e.amount) AS total
+       FROM expenses e
+       LEFT JOIN categories c ON c.id = e.category_id
+       ${filters.where}
+       GROUP BY e.category_id, c.name
+       ORDER BY total DESC`,
+      filters.values
+    );
 
     res.json({
       success: true,
-      data: categoryData
-    })
+      data: categoryData.map((item) => ({ ...item, total: Number(item.total) })),
+    });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching category spending',
-      error: error.message
-    })
+    res.status(500).json({ success: false, message: "Unable to calculate category expenses" });
   }
-}
+};
+
+export const getCategories = async (_req, res) => {
+  try {
+    const [categories] = await pool.query(
+      "SELECT id, name, color FROM categories ORDER BY name"
+    );
+    res.json({ success: true, data: categories });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Unable to load categories" });
+  }
+};

@@ -1,10 +1,16 @@
-import express from 'express'
-import { getSummary, getMonthlyExpenses, getCategorySpending } from '../controllers/summaryController.js'
+import express from "express";
+import {
+  categoryExpenses,
+  getCategories,
+  getSummary,
+  monthlyExpenses,
+} from "../controllers/summaryController.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/', getSummary)
-router.get('/monthly', getMonthlyExpenses)
-router.get('/categories', getCategorySpending)
+router.get("/summary", getSummary);
+router.get("/expenses/monthly", monthlyExpenses);
+router.get("/expenses/by-category", categoryExpenses);
+router.get("/categories", getCategories);
 
-export default router
+export default router;
