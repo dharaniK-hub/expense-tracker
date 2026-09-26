@@ -369,3 +369,107 @@ h2 { margin: 4px 0 0; font-size: 18px; letter-spacing: 0; }
   .legend-row { gap: 8px; }
   .legend-row strong { font-size: 12px; }
 }
+
+/* Shared application theme */
+.lc-app-shell {
+  min-height: 100vh;
+  padding: 12px 20px 44px;
+  color: #edf7f4;
+  background: linear-gradient(135deg, rgba(4, 19, 25, .96), rgba(6, 42, 43, .92)), url('/landingpage.png') center / cover fixed;
+}
+
+.lc-app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(88, 222, 199, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(88, 222, 199, .05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.lc-app-nav {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(1160px, 100%);
+  min-height: 58px;
+  margin: 0 auto 34px;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(192, 245, 232, .28);
+  border-radius: 8px;
+  background: rgba(7, 29, 37, .72);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(16px);
+}
+
+.lc-app-nav nav, .lc-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lc-app-nav nav > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #c2d1d5;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.lc-app-nav nav > a:hover, .lc-app-nav .lc-profile-link:hover { color: #65ead2; }
+.lc-profile-link { padding-left: 12px; border-left: 1px solid rgba(255, 255, 255, .16); }
+.lc-user-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-profile-icon { display: grid; width: 31px; height: 31px; place-items: center; border: 1px solid rgba(192, 245, 232, .36); border-radius: 50%; color: #6ce6d1 !important; background: rgba(255, 255, 255, .08); }
+
+.lc-app-shell .dashboard, .lc-app-shell .profile-page {
+  position: relative;
+  z-index: 1;
+  width: min(1160px, 100%);
+  margin: 0 auto;
+  padding: 0;
+}
+
+.lc-app-shell .dashboard-header, .lc-app-shell .profile-heading { color: #f4fffc; }
+.lc-app-shell .subtitle, .lc-app-shell .profile-heading p:not(.eyebrow) { color: #b8ccc9; }
+.lc-app-shell .eyebrow, .lc-app-shell .header-icon, .lc-app-shell .profile-heading > svg { color: #55e3ca; }
+
+.lc-app-shell .filter-bar, .lc-app-shell .summary-card, .lc-app-shell .chart-panel, .lc-app-shell .insight-card, .lc-app-shell .profile-form {
+  border-color: rgba(202, 248, 239, .22);
+  background: rgba(8, 39, 43, .76);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, .23);
+  backdrop-filter: blur(14px);
+}
+
+.lc-app-shell .filter-bar, .lc-app-shell .summary-card, .lc-app-shell .chart-panel, .lc-app-shell .insight-card, .lc-app-shell .profile-form { color: #edf7f4; }
+.lc-app-shell .filter-bar label, .lc-app-shell .summary-card-head > span:first-child, .lc-app-shell .summary-card p, .lc-app-shell .insight-card p, .lc-app-shell .legend-row { color: #b8ccc9; }
+.lc-app-shell .legend-row strong, .lc-app-shell .panel-title > svg { color: #dffaf2; }
+
+.lc-app-shell input, .lc-app-shell select {
+  border-color: rgba(186, 235, 224, .25);
+  color: #effcf8;
+  background: rgba(3, 24, 28, .72);
+}
+
+.lc-app-shell option { color: #effcf8; background: #08272b; }
+.lc-app-shell .apply-button, .lc-app-shell .profile-actions button { border: 0; background: linear-gradient(90deg, #31cfcc, #1598e5); color: #031820; }
+.lc-app-shell .clear-button { color: #65ead2; }
+.lc-app-shell .summary-icon { background: rgba(70, 213, 191, .14); color: #65ead2; }
+.lc-app-shell .income-card .summary-icon, .lc-app-shell .expense-card .summary-icon, .lc-app-shell .balance-card .summary-icon { color: #65ead2; background: rgba(70, 213, 191, .14); }
+.lc-app-shell .chart-box, .lc-app-shell .pie-box { color: #b8ccc9; }
+
+.password-field { position: relative; }
+.password-field input { padding-right: 46px !important; }
+.password-field button { position: absolute; top: 50%; right: 9px; display: grid; width: 30px; height: 30px; place-items: center; transform: translateY(-50%); border: 0; color: #82d9cc; background: transparent; }
+
+@media (max-width: 600px) {
+  .lc-app-shell { padding: 10px 14px 32px; }
+  .lc-app-nav { margin-bottom: 24px; padding: 0 12px; }
+  .lc-app-nav nav > a:first-child { font-size: 0; }
+  .lc-user-name { display: none; }
+  .lc-profile-link { padding-left: 8px; }
+  .lc-nav-actions > a:first-child { display: none; }
+}

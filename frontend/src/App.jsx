@@ -7,6 +7,7 @@ import Profile from "./components/Profile";
 const routes = {
   "/": Landing,
   "/login": Login,
+  "/forgot-password": Login,
   "/dashboard": Dashboard,
   "/profile": Profile,
 };

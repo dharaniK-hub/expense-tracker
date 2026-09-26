@@ -70,7 +70,7 @@ const Landing = () => {
           <a href="/dashboard">Categories</a>
           <a href="/profile">Security</a>
         </div>
-        <div className="lc-nav-actions"><a href="/login">Sign In</a><a className="lc-nav-cta" href="/dashboard">Get Started <span>→</span></a></div>
+        <div className="lc-nav-actions"><a href="/login">Sign In</a><a className="lc-nav-cta" href="/dashboard">Get Started <span>→</span></a><a className="lc-profile-icon" href="/profile" aria-label="Open your profile"><CircleUserRound size={20} /></a></div>
       </nav>
 
       <section className="lc-hero">
