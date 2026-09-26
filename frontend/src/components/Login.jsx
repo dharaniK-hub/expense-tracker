@@ -4,7 +4,7 @@ import { useState } from "react";
 const API_URL = "http://localhost:5000";
 
 export default function AuthPage() {
-  const [mode, setMode] = useState(window.location.pathname === "/forgot-password" ? "forgot" : "signin");
+  const [mode, setMode] = useState(window.location.pathname === "/forgot-password" ? "forgot" : window.location.pathname === "/signup" ? "signup" : "signin");
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [message, setMessage] = useState('');
@@ -58,10 +58,10 @@ export default function AuthPage() {
         localStorage.setItem("ledgercraft-user", JSON.stringify(data.user));
         const currentProfile = JSON.parse(localStorage.getItem("expense-tracker-profile") || "{}");
         localStorage.setItem("expense-tracker-profile", JSON.stringify({ ...currentProfile, ...data.user }));
-        window.location.assign("/dashboard");
+        window.location.assign("/home");
       } else {
         setForm({ name: '', email: '', password: '', confirmPassword: '' });
-        switchMode("signin");
+        window.location.assign("/login");
       }
     } catch (error) {
       setMessage(error.message || 'Unable to connect to the backend.');
@@ -160,7 +160,7 @@ export default function AuthPage() {
           {!isRecovery && <div className="mt-8 text-center">
             <p className="text-sm text-blue-100">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
-              <button type="button" onClick={() => switchMode(isLogin ? "signup" : "signin")} className="text-cyan-300 font-bold hover:underline">
+              <button type="button" onClick={() => window.location.assign(isLogin ? "/signup" : "/login")} className="text-cyan-300 font-bold hover:underline">
                 {isLogin ? 'Sign up' : 'Log in'}
               </button>
             </p>

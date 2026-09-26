@@ -10,7 +10,14 @@ const fallbackCategories = [
   { id: 5, name: "Other" },
 ];
 
-const Landing = () => {
+const Landing = ({ showExpenseForm = false }) => {
+  const [userName] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("ledgercraft-user"))?.name || "there";
+    } catch {
+      return "there";
+    }
+  });
   const [categories, setCategories] = useState(fallbackCategories);
   const [expense, setExpense] = useState({
     amount: "",
@@ -64,25 +71,25 @@ const Landing = () => {
           <span className="lc-brand-mark"><img src="/icons.svg" alt="" /></span>
           <span><strong>Ledger</strong>Craft<small>WEALTH INTELLIGENCE</small></span>
         </a>
-        <div className="lc-nav-links">
+        {showExpenseForm && <div className="lc-nav-links">
           <a className="active" href="/">Overview</a>
           <a href="/dashboard">Analytics</a>
           <a href="/dashboard">Categories</a>
           <a href="/profile">Security</a>
-        </div>
-        <div className="lc-nav-actions"><a href="/login">Sign In</a><a className="lc-nav-cta" href="/dashboard">Get Started <span>→</span></a><a className="lc-profile-icon" href="/profile" aria-label="Open your profile"><CircleUserRound size={20} /></a></div>
+        </div>}
+        <div className="lc-nav-actions">{showExpenseForm ? <><span className="lc-greeting">Hi, {userName}</span><a className="lc-nav-cta" href="/dashboard">Open dashboard <span>→</span></a></> : <a href="/login">Sign In</a>}<a className="lc-profile-icon" href="/profile" aria-label="Open your profile"><CircleUserRound size={20} /></a></div>
       </nav>
 
-      <section className="lc-hero">
+      <section className={`lc-hero ${showExpenseForm ? "" : "lc-hero-public"}`}>
         <div className="lc-hero-copy">
           <p className="lc-kicker"><i /> PERSONAL FINANCE, MADE CLEAR</p>
           <h1>Know where every <em>rupee</em> goes.</h1>
           <p className="lc-hero-text">Record an expense here, then use the dashboard to understand the spending patterns and wealth velocity behind it.</p>
-          <div className="lc-hero-actions"><a className="lc-primary" href="/dashboard"><BarChart3 size={16} /> Open Dashboard</a><a className="lc-secondary" href="/profile"><CircleUserRound size={16} /> Profile &amp; Budgets</a></div>
+          <div className="lc-hero-actions"><a className="lc-primary" href={showExpenseForm ? "/dashboard" : "/login"}><BarChart3 size={16} /> {showExpenseForm ? "Open Dashboard" : "Sign in to begin"}</a>{showExpenseForm && <a className="lc-secondary" href="/profile"><CircleUserRound size={16} /> Profile &amp; Budgets</a>}</div>
           <div className="lc-proof"><span><b>●</b> ₹3.8M+ <small>Tracked this month</small></span><span><b>●</b> 99.9% <small>Real-time Sync</small></span><span><b>●</b> Bank-grade <small>256-bit Security</small></span></div>
         </div>
 
-        <form className="lc-entry-card" onSubmit={addExpense}>
+        {showExpenseForm && <form className="lc-entry-card" onSubmit={addExpense}>
           <div className="lc-card-top"><div><p className="lc-kicker">NEW ENTRY</p><h2>Add an expense</h2></div><FileText size={21} /></div>
           <label><span>AMOUNT (₹)</span><input type="number" min="0.01" step="0.01" name="amount" value={expense.amount} onChange={updateExpense} placeholder="0.00" required /></label>
           <label><span>DESCRIPTION</span><input name="description" value={expense.description} onChange={updateExpense} placeholder="What did you spend on?" required /></label>
@@ -91,7 +98,7 @@ const Landing = () => {
           {message && <p className="lc-form-message">{message}</p>}
           <button className="lc-submit" type="submit" disabled={saving}><Plus size={17} /> {saving ? "Adding..." : "Add expense"}</button>
           <p className="lc-secure">◉ Auto-categorized &amp; instantly aggregated in your analytics</p>
-        </form>
+        </form>}
       </section>
 
       <section className="lc-features"><article><span><ReceiptText size={19} /></span><h3>Record expenses</h3><p>Keep everyday purchases and their categories in one orderly place. Real-time capture with smart receipts and instant tagging.</p></article><article><span><BarChart3 size={19} /></span><h3>See the patterns</h3><p>Monthly and category charts make spending trends easy to spot. Identify recurring leaks, seasonal habits, and savings opportunities.</p></article><article><span><ShieldCheck size={19} /></span><h3>Stay in control</h3><p>Use a personal profile and budget preference to keep context close. Receive alerts before crossing thresholds and safeguard goals.</p></article></section>
