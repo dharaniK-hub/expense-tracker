@@ -15,7 +15,8 @@ const Profile = () => {
 
   useEffect(() => {
     const signedInUser = JSON.parse(localStorage.getItem("ledgercraft-user") || "null");
-    const storedProfile = localStorage.getItem("expense-tracker-profile");
+    const profileKey = signedInUser ? `expense-tracker-profile-${signedInUser.id}` : "expense-tracker-profile";
+    const storedProfile = localStorage.getItem(profileKey);
     const savedProfile = storedProfile ? JSON.parse(storedProfile) : {};
     setProfile({ ...defaultProfile, ...savedProfile, ...(signedInUser || {}) });
   }, []);
@@ -27,7 +28,9 @@ const Profile = () => {
 
   const saveProfile = (event) => {
     event.preventDefault();
-    localStorage.setItem("expense-tracker-profile", JSON.stringify(profile));
+    const signedInUser = JSON.parse(localStorage.getItem("ledgercraft-user") || "null");
+    const profileKey = signedInUser ? `expense-tracker-profile-${signedInUser.id}` : "expense-tracker-profile";
+    localStorage.setItem(profileKey, JSON.stringify(profile));
     setSaved(true);
   };
 

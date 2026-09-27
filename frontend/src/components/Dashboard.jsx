@@ -13,7 +13,17 @@ import AppNav from "./AppNav";
 
 const API_URL = "http://localhost:5000";
 
-const emptyFilters = { startDate: "", endDate: "", category: "" };
+const now = new Date();
+const pad = (n) => n.toString().padStart(2, "0");
+const currentYear = now.getFullYear();
+const currentMonth = pad(now.getMonth() + 1);
+const lastDay = pad(new Date(currentYear, now.getMonth() + 1, 0).getDate());
+
+const defaultFilters = { 
+  startDate: `${currentYear}-${currentMonth}-01`, 
+  endDate: `${currentYear}-${currentMonth}-${lastDay}`, 
+  category: "" 
+};
 
 const fallbackCategories = [
   { id: 1, name: "Food & Dining" },
@@ -23,8 +33,9 @@ const fallbackCategories = [
   { id: 5, name: "Other" },
 ];
 
-const makeSearch = (filters) => {
+const makeSearch = (filters, userId) => {
   const params = new URLSearchParams();
+  if (userId) params.set("user_id", userId);
   if (filters.startDate) params.set("startDate", filters.startDate);
   if (filters.endDate) params.set("endDate", filters.endDate);
   if (filters.category) params.set("category", filters.category);
@@ -33,8 +44,8 @@ const makeSearch = (filters) => {
 };
 
 const Dashboard = () => {
-  const [filters, setFilters] = useState(emptyFilters);
-  const [appliedFilters, setAppliedFilters] = useState(emptyFilters);
+  const [filters, setFilters] = useState(defaultFilters);
+  const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
   const [categories, setCategories] = useState(fallbackCategories);
   const [summary, setSummary] = useState(null);
   const [monthlyData, setMonthlyData] = useState([]);
@@ -61,7 +72,9 @@ const Dashboard = () => {
     setError("");
 
     try {
-      const search = makeSearch(appliedFilters);
+      const user = JSON.parse(localStorage.getItem("ledgercraft-user") || "null");
+      const userId = user?.id;
+      const search = makeSearch(appliedFilters, userId);
       const [summaryResponse, monthlyResponse, categoryResponse] = await Promise.all([
         fetch(`${API_URL}/summary${search}`),
         fetch(`${API_URL}/expenses/monthly${search}`),
@@ -106,11 +119,14 @@ const Dashboard = () => {
   };
 
   const clearFilters = () => {
-    setFilters(emptyFilters);
-    setAppliedFilters(emptyFilters);
+    setFilters(defaultFilters);
+    setAppliedFilters(defaultFilters);
   };
 
-  const profile = JSON.parse(localStorage.getItem("expense-tracker-profile") || "{}");
+  const user = JSON.parse(localStorage.getItem("ledgercraft-user") || "null");
+  const userId = user?.id;
+  const profileKey = userId ? `expense-tracker-profile-${userId}` : "expense-tracker-profile";
+  const profile = JSON.parse(localStorage.getItem(profileKey) || "{}");
   const budget = Number(profile.monthlyBudget || 0);
 
   const activeSummary = summary || {
@@ -162,7 +178,7 @@ const Dashboard = () => {
       )}
 
       <section className="summary-grid" aria-label="Financial summary">
-        <SummaryCard title="Budget" amount={budget} icon="income" />
+        <SummaryCard title="Monthly budget" amount={budget} icon="income" />
         <SummaryCard title="Total expenses" amount={activeSummary.totalExpenses} icon="expense" />
         <SummaryCard title="Balance" amount={budget - activeSummary.totalExpenses} icon="balance" />
       </section>

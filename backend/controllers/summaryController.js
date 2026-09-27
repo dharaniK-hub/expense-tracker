@@ -4,6 +4,11 @@ const buildFilters = (query) => {
   const conditions = [];
   const values = [];
 
+  if (query.user_id) {
+    conditions.push("e.user_id = ?");
+    values.push(Number(query.user_id));
+  }
+
   if (query.startDate) {
     conditions.push("e.date >= ?");
     values.push(query.startDate);

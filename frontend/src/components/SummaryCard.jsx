@@ -19,7 +19,7 @@ const SummaryCard = ({ title, amount, icon }) => {
       <strong>
         Rs. {value.toLocaleString("en-LK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </strong>
-      <p>{title === "Budget" ? "Your monthly budget limit." : icon === "income" ? "Income records are not yet tracked." : "For the selected filters."}</p>
+      <p>{title === "Monthly budget" ? "Your monthly budget limit." : icon === "income" ? "Income records are not yet tracked." : "For the selected filters."}</p>
     </article>
   );
 };

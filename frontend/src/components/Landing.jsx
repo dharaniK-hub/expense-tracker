@@ -11,13 +11,14 @@ const fallbackCategories = [
 ];
 
 const Landing = ({ showExpenseForm = false }) => {
-  const [userName] = useState(() => {
+  const [user] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("ledgercraft-user"))?.name || "there";
+      return JSON.parse(localStorage.getItem("ledgercraft-user"));
     } catch {
-      return "there";
+      return null;
     }
   });
+  const userName = user?.name || "there";
   const [categories, setCategories] = useState(fallbackCategories);
   const [expense, setExpense] = useState({
     amount: "",
@@ -50,7 +51,7 @@ const Landing = ({ showExpenseForm = false }) => {
       const response = await fetch(`${API_URL}/expenses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(expense),
+        body: JSON.stringify({ ...expense, user_id: user?.id }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Unable to save expense.");
