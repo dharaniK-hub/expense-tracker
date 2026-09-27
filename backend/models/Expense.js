@@ -1,17 +1,16 @@
 // Expense model and database operations
-export const getExpenses = async (pool, userId) => {
+export const getExpenses = async (pool) => {
   const [rows] = await pool.query(
-    'SELECT * FROM expenses WHERE user_id = ? ORDER BY date DESC',
-    [userId]
+    'SELECT * FROM expenses ORDER BY date DESC'
   )
   return rows
 }
 
 export const addExpense = async (pool, expense) => {
-  const { user_id, category_id, description, amount, date, payment_method, notes } = expense
+  const { category_id, description, amount, date } = expense
   const [result] = await pool.query(
-    'INSERT INTO expenses (user_id, category_id, description, amount, date, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [user_id, category_id, description, amount, date, payment_method, notes]
+    'INSERT INTO expenses (category_id, description, amount, date) VALUES (?, ?, ?, ?)',
+    [category_id, description, amount, date]
   )
   return result
 }

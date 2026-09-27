@@ -30,8 +30,8 @@ export const createExpense = async (req, res) => {
     }
     
     const [result] = await pool.query(
-      'INSERT INTO expenses (user_id, category_id, description, amount, date, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [1, numericCategoryId, description.trim(), numericAmount, date, payment_method || null, notes || null]
+      'INSERT INTO expenses (category_id, description, amount, date) VALUES (?, ?, ?, ?)',
+      [numericCategoryId, description.trim(), numericAmount, date]
     )
     
     res.status(201).json({
