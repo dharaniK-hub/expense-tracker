@@ -4,6 +4,11 @@ const buildFilters = (query) => {
   const conditions = [];
   const values = [];
 
+  if (query.user_id) {
+    conditions.push("e.user_id = ?");
+    values.push(Number(query.user_id));
+  }
+
   if (query.startDate) {
     conditions.push("e.date >= ?");
     values.push(query.startDate);
@@ -128,7 +133,7 @@ export const categoryExpenses = async (req, res) => {
 export const getCategories = async (_req, res) => {
   try {
     const [categories] = await pool.query(
-      "SELECT id, name, color FROM categories ORDER BY name"
+      "SELECT id, name FROM categories ORDER BY name"
     );
     res.json({ success: true, data: categories });
   } catch (error) {

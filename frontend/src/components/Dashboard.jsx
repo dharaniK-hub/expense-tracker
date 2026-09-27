@@ -5,6 +5,7 @@ import {
   CircleDollarSign,
   Filter,
   Tags,
+  ArrowLeft,
 } from "lucide-react";
 import SummaryCard from "./SummaryCard";
 import SpendingCharts from "./SpendingCharts";
@@ -12,10 +13,29 @@ import AppNav from "./AppNav";
 
 const API_URL = "http://localhost:5000";
 
-const emptyFilters = { startDate: "", endDate: "", category: "" };
+const now = new Date();
+const pad = (n) => n.toString().padStart(2, "0");
+const currentYear = now.getFullYear();
+const currentMonth = pad(now.getMonth() + 1);
+const lastDay = pad(new Date(currentYear, now.getMonth() + 1, 0).getDate());
 
-const makeSearch = (filters) => {
+const defaultFilters = { 
+  startDate: `${currentYear}-${currentMonth}-01`, 
+  endDate: `${currentYear}-${currentMonth}-${lastDay}`, 
+  category: "" 
+};
+
+const fallbackCategories = [
+  { id: 1, name: "Food & Dining" },
+  { id: 2, name: "Transportation" },
+  { id: 3, name: "Entertainment" },
+  { id: 4, name: "Rent & Bills" },
+  { id: 5, name: "Other" },
+];
+
+const makeSearch = (filters, userId) => {
   const params = new URLSearchParams();
+  if (userId) params.set("user_id", userId);
   if (filters.startDate) params.set("startDate", filters.startDate);
   if (filters.endDate) params.set("endDate", filters.endDate);
   if (filters.category) params.set("category", filters.category);
@@ -24,9 +44,9 @@ const makeSearch = (filters) => {
 };
 
 const Dashboard = () => {
-  const [filters, setFilters] = useState(emptyFilters);
-  const [appliedFilters, setAppliedFilters] = useState(emptyFilters);
-  const [categories, setCategories] = useState([]);
+  const [filters, setFilters] = useState(defaultFilters);
+  const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
+  const [categories, setCategories] = useState(fallbackCategories);
   const [summary, setSummary] = useState(null);
   const [monthlyData, setMonthlyData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
@@ -39,7 +59,7 @@ const Dashboard = () => {
         const response = await fetch(`${API_URL}/categories`);
         if (!response.ok) throw new Error();
         const payload = await response.json();
-        setCategories(payload.data || []);
+        if (payload.data?.length) setCategories(payload.data);
       } catch {
         setError("Categories could not be loaded for filtering.");
       }
@@ -52,7 +72,9 @@ const Dashboard = () => {
     setError("");
 
     try {
-      const search = makeSearch(appliedFilters);
+      const user = JSON.parse(localStorage.getItem("ledgercraft-user") || "null");
+      const userId = user?.id;
+      const search = makeSearch(appliedFilters, userId);
       const [summaryResponse, monthlyResponse, categoryResponse] = await Promise.all([
         fetch(`${API_URL}/summary${search}`),
         fetch(`${API_URL}/expenses/monthly${search}`),
@@ -97,14 +119,18 @@ const Dashboard = () => {
   };
 
   const clearFilters = () => {
-    setFilters(emptyFilters);
-    setAppliedFilters(emptyFilters);
+    setFilters(defaultFilters);
+    setAppliedFilters(defaultFilters);
   };
 
+  const user = JSON.parse(localStorage.getItem("ledgercraft-user") || "null");
+  const userId = user?.id;
+  const profileKey = userId ? `expense-tracker-profile-${userId}` : "expense-tracker-profile";
+  const profile = JSON.parse(localStorage.getItem(profileKey) || "{}");
+  const budget = Number(profile.monthlyBudget || 0);
+
   const activeSummary = summary || {
-    totalIncome: 0,
     totalExpenses: 0,
-    balance: 0,
     highestSpendingCategory: null,
   };
 
@@ -114,6 +140,7 @@ const Dashboard = () => {
     <main className="dashboard">
       <header className="dashboard-header">
         <div>
+          <a href="/home" aria-label="Go back to home" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', textDecoration: 'none', fontSize: '13px', marginBottom: '16px', fontWeight: 'bold' }}><ArrowLeft size={16} /> Back to Home</a>
           <p className="eyebrow">Financial overview</p>
           <h1>Dashboard</h1>
           <p className="subtitle">A clear picture of your expenses and spending patterns.</p>
@@ -151,9 +178,9 @@ const Dashboard = () => {
       )}
 
       <section className="summary-grid" aria-label="Financial summary">
-        <SummaryCard title="Total income" amount={activeSummary.totalIncome} icon="income" />
+        <SummaryCard title="Monthly budget" amount={budget} icon="income" />
         <SummaryCard title="Total expenses" amount={activeSummary.totalExpenses} icon="expense" />
-        <SummaryCard title="Balance" amount={activeSummary.balance} icon="balance" />
+        <SummaryCard title="Balance" amount={budget - activeSummary.totalExpenses} icon="balance" />
       </section>
 
       <section className="analytics-layout">
