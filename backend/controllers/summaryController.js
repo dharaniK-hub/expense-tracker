@@ -128,7 +128,7 @@ export const categoryExpenses = async (req, res) => {
 export const getCategories = async (_req, res) => {
   try {
     const [categories] = await pool.query(
-      "SELECT id, name, color FROM categories ORDER BY name"
+      "SELECT id, name FROM categories ORDER BY name"
     );
     res.json({ success: true, data: categories });
   } catch (error) {

@@ -71,7 +71,7 @@ const Landing = ({ showExpenseForm = false }) => {
           <span className="lc-brand-mark"><img src="/icons.svg" alt="" /></span>
           <span><strong>Ledger</strong>Craft<small>WEALTH INTELLIGENCE</small></span>
         </a>
-        <div className="lc-nav-actions">{showExpenseForm ? <><span className="lc-greeting">Hi, {userName}</span><a className="lc-nav-cta" href="/dashboard">Open dashboard <span>→</span></a></> : <a href="/login">Sign In</a>}<a className="lc-profile-icon" href="/profile" aria-label="Open your profile"><CircleUserRound size={20} /></a></div>
+        <div className="lc-nav-actions">{showExpenseForm ? <><span className="lc-greeting">Hi, {userName}</span><a className="lc-nav-cta" href="/dashboard">Open dashboard <span>→</span></a></> : <a href="/login">Sign In</a>}</div>
       </nav>
 
       <section className={showExpenseForm ? "lc-home-entry" : "lc-hero lc-hero-public"}>

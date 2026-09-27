@@ -1,4 +1,4 @@
-import { Eye, EyeOff, KeyRound, UserRound } from "lucide-react";
+import { Eye, EyeOff, KeyRound, UserRound, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 const API_URL = "http://localhost:5000";
@@ -84,11 +84,11 @@ export default function AuthPage() {
         <img className="h-full w-full rounded-2xl object-cover" src="/transport.png" alt="Futuristic blue car" />
       </div>
 
-      <nav className="relative z-20 flex items-center justify-between px-8 py-6">
+      <nav className="relative z-20 flex items-center px-8 py-6 gap-4">
+        <a href="/" aria-label="Go back" className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center hover:bg-white/30 transition-colors"><ArrowLeft size={20} /></a>
         <div className="flex items-center gap-2 text-xl font-bold tracking-wide">
           <span className="text-cyan-300">📈</span> LedgerCraft
         </div>
-        <a href="/profile" aria-label="Open your profile" className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center hover:bg-white/30 transition-colors"><UserRound size={20} /></a>
       </nav>
 
       <main className="relative z-20 flex-1 flex items-center justify-center p-4">

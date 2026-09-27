@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CircleUserRound, Mail, Save, Wallet } from "lucide-react";
+import { CircleUserRound, Mail, Save, Wallet, ArrowLeft, LogOut } from "lucide-react";
 import AppNav from "./AppNav";
 
 const defaultProfile = {
@@ -31,12 +31,18 @@ const Profile = () => {
     setSaved(true);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("ledgercraft-user");
+    window.location.assign("/");
+  };
+
   return (
     <div className="lc-app-shell">
       <AppNav />
     <main className="profile-page">
       <header className="profile-heading">
         <div>
+          <a href="/dashboard" aria-label="Go back" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', textDecoration: 'none', fontSize: '13px', marginBottom: '16px', fontWeight: 'bold' }}><ArrowLeft size={16} /> Back to Dashboard</a>
           <p className="eyebrow">Account</p>
           <h1>Your profile</h1>
           <p>Set the details that personalize your expense tracking experience.</p>
@@ -85,6 +91,7 @@ const Profile = () => {
 
         <footer className="profile-actions">
           {saved && <span className="saved-message">Profile saved.</span>}
+          <button type="button" onClick={handleLogout} style={{ background: 'transparent', border: '1px solid rgba(220, 38, 38, 0.4)', color: '#ef4444' }}><LogOut size={17} aria-hidden="true" /> Log out</button>
           <button type="submit"><Save size={17} aria-hidden="true" /> Save profile</button>
         </footer>
       </form>
